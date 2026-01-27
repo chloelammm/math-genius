@@ -1,0 +1,169 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Check, X, ArrowRight } from 'lucide-react';
+import VisualCounter from './VisualCounter';
+
+export default function QuestionDisplay({ 
+  num1, 
+  num2, 
+  operation, 
+  onAnswer, 
+  questionNumber, 
+  totalQuestions,
+  theme = 'fruits'
+}) {
+  const [userAnswer, setUserAnswer] = useState('');
+  const [showFeedback, setShowFeedback] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(null);
+
+  const correctAnswer = operation === '+' ? num1 + num2 : num1 - num2;
+
+  useEffect(() => {
+    setUserAnswer('');
+    setShowFeedback(null);
+    setIsCorrect(null);
+  }, [num1, num2, operation]);
+
+  const handleSubmit = () => {
+    if (userAnswer === '') return;
+    
+    const answer = parseInt(userAnswer);
+    const correct = answer === correctAnswer;
+    setIsCorrect(correct);
+    setShowFeedback(true);
+    
+    setTimeout(() => {
+      onAnswer(correct, userAnswer);
+      setShowFeedback(null);
+      setUserAnswer('');
+    }, 1500);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-2xl mx-auto"
+    >
+      {/* Progress indicator */}
+      <div className="flex justify-center gap-2 mb-6">
+        {Array.from({ length: totalQuestions }).map((_, i) => (
+          <div
+            key={i}
+            className={`w-3 h-3 rounded-full transition-all ${
+              i < questionNumber - 1 
+                ? 'bg-green-400' 
+                : i === questionNumber - 1 
+                  ? 'bg-blue-500 scale-125' 
+                  : 'bg-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Question card */}
+      <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8">
+        {/* Visual representation */}
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+            <div className="bg-blue-50 rounded-2xl p-4 min-w-[120px]">
+              <p className="text-center text-lg font-bold text-blue-600 mb-2">{num1}</p>
+              <VisualCounter count={num1} theme={theme} />
+            </div>
+            
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="text-4xl md:text-5xl font-bold text-gray-700"
+            >
+              {operation}
+            </motion.div>
+            
+            <div className={`rounded-2xl p-4 min-w-[120px] ${operation === '+' ? 'bg-green-50' : 'bg-orange-50'}`}>
+              <p className={`text-center text-lg font-bold ${operation === '+' ? 'text-green-600' : 'text-orange-600'} mb-2`}>{num2}</p>
+              <VisualCounter 
+                count={num2} 
+                theme={theme} 
+                showCrossed={operation === '-'} 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Question text */}
+        <div className="text-center mb-6">
+          <p className="text-2xl md:text-4xl font-bold text-gray-800">
+            {num1} {operation} {num2} = <span className="text-blue-500">?</span>
+          </p>
+        </div>
+
+        {/* Answer input */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          <Input
+            type="number"
+            value={userAnswer}
+            onChange={(e) => setUserAnswer(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="輸入答案"
+            className="text-center text-2xl md:text-3xl font-bold h-16 w-40 rounded-xl border-3 border-blue-300 focus:border-blue-500"
+            disabled={showFeedback}
+          />
+          <Button
+            onClick={handleSubmit}
+            disabled={userAnswer === '' || showFeedback}
+            className="h-16 px-8 text-xl font-bold rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+          >
+            確認 <ArrowRight className="ml-2 w-6 h-6" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Feedback overlay */}
+      <AnimatePresence>
+        {showFeedback && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/30 z-50"
+          >
+            <motion.div
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              className={`
+                rounded-3xl p-8 md:p-12 text-center shadow-2xl
+                ${isCorrect ? 'bg-green-500' : 'bg-red-500'}
+              `}
+            >
+              {isCorrect ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ repeat: 2, duration: 0.3 }}
+                  >
+                    <Check className="w-16 h-16 md:w-24 md:h-24 text-white mx-auto mb-4" />
+                  </motion.div>
+                  <p className="text-2xl md:text-4xl font-bold text-white">做得好！🎉</p>
+                </>
+              ) : (
+                <>
+                  <X className="w-16 h-16 md:w-24 md:h-24 text-white mx-auto mb-4" />
+                  <p className="text-2xl md:text-4xl font-bold text-white">再試試！</p>
+                  <p className="text-xl text-white/90 mt-2">答案是 {correctAnswer}</p>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}

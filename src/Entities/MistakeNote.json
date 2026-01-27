@@ -1,0 +1,57 @@
+{
+  "name": "MistakeNote",
+  "type": "object",
+  "properties": {
+    "num1": {
+      "type": "number",
+      "description": "First number in the question"
+    },
+    "num2": {
+      "type": "number",
+      "description": "Second number in the question"
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "+",
+        "-"
+      ],
+      "description": "Math operation"
+    },
+    "correct_answer": {
+      "type": "number",
+      "description": "The correct answer"
+    },
+    "user_answer": {
+      "type": "number",
+      "description": "What the user answered"
+    },
+    "mistake_type": {
+      "type": "string",
+      "enum": [
+        "carry",
+        "borrow",
+        "basic",
+        "mixed"
+      ],
+      "description": "Type of mistake"
+    },
+    "practiced": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this has been practiced"
+    },
+    "practice_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times practiced"
+    }
+  },
+  "required": [
+    "num1",
+    "num2",
+    "operation",
+    "correct_answer",
+    "user_answer"
+  ]
+}

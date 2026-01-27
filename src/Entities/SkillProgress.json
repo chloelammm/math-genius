@@ -1,0 +1,38 @@
+{
+  "name": "SkillProgress",
+  "type": "object",
+  "properties": {
+    "skill_type": {
+      "type": "string",
+      "enum": [
+        "add_no_carry",
+        "add_with_carry",
+        "sub_no_borrow",
+        "sub_with_borrow",
+        "add_tens",
+        "sub_tens"
+      ],
+      "description": "Type of skill being practiced"
+    },
+    "level": {
+      "type": "number",
+      "description": "Current level in this skill (1-5)"
+    },
+    "total_correct": {
+      "type": "number",
+      "description": "Total correct answers"
+    },
+    "total_attempted": {
+      "type": "number",
+      "description": "Total questions attempted"
+    },
+    "mastery_percentage": {
+      "type": "number",
+      "description": "Mastery level 0-100"
+    }
+  },
+  "required": [
+    "skill_type",
+    "level"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "Progress",
+  "type": "object",
+  "properties": {
+    "level_id": {
+      "type": "number",
+      "description": "The level number (1-9)"
+    },
+    "stars_earned": {
+      "type": "number",
+      "description": "Stars earned for this level (0-3)"
+    },
+    "best_score": {
+      "type": "number",
+      "description": "Best score achieved (out of 5 questions)"
+    },
+    "completed": {
+      "type": "boolean",
+      "description": "Whether level is completed"
+    },
+    "operation_type": {
+      "type": "string",
+      "enum": [
+        "addition",
+        "subtraction",
+        "mixed"
+      ],
+      "description": "Type of math operation"
+    }
+  },
+  "required": [
+    "level_id",
+    "stars_earned",
+    "completed"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "TimeChallengeScore",
+  "type": "object",
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": [
+        "60s",
+        "120s",
+        "180s"
+      ],
+      "description": "Time mode"
+    },
+    "score": {
+      "type": "number",
+      "description": "Number of correct answers"
+    },
+    "total_attempted": {
+      "type": "number",
+      "description": "Total questions attempted"
+    },
+    "accuracy": {
+      "type": "number",
+      "description": "Accuracy percentage"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "description": "Difficulty level"
+    }
+  },
+  "required": [
+    "mode",
+    "score",
+    "total_attempted"
+  ]
+}
