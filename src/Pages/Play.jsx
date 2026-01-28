@@ -2,8 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import QuestionDisplay from '@/components/math/QuestionDisplay';
@@ -54,9 +52,31 @@ function generateQuestion(level) {
   return { num1, num2, operation };
 }
 
+// Helper functions for localStorage
+const saveProgress = (levelId, progressData) => {
+  const allProgress = JSON.parse(localStorage.getItem('mathGenius_progress') || '[]');
+  const existing = allProgress.find(p => p.level_id === levelId);
+  
+  if (existing) {
+    // Only update if new score is better
+    if (progressData.stars_earned > existing.stars_earned) {
+      Object.assign(existing, progressData);
+    }
+  } else {
+    allProgress.push({ ...progressData, level_id: levelId });
+  }
+  
+  localStorage.setItem('mathGenius_progress', JSON.stringify(allProgress));
+};
+
+const saveMistake = (mistakeData) => {
+  const allMistakes = JSON.parse(localStorage.getItem('mathGenius_mistakes') || '[]');
+  allMistakes.push({ ...mistakeData, id: Date.now() });
+  localStorage.setItem('mathGenius_mistakes', JSON.stringify(allMistakes));
+};
+
 export default function Play() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   
   const urlParams = new URLSearchParams(window.location.search);
   const levelId = parseInt(urlParams.get('level')) || 1;
@@ -78,28 +98,6 @@ export default function Play() {
     setGameState('playing');
   }, [levelId]);
 
-  const { data: progress = [] } = useQuery({
-    queryKey: ['progress'],
-    queryFn: () => base44.entities.Progress.list(),
-  });
-
-  const saveProgressMutation = useMutation({
-    mutationFn: async (newProgress) => {
-      const existing = progress.find(p => p.level_id === levelId);
-      if (existing) {
-        // Only update if new score is better
-        if (newProgress.stars_earned > existing.stars_earned) {
-          return base44.entities.Progress.update(existing.id, newProgress);
-        }
-        return existing;
-      }
-      return base44.entities.Progress.create(newProgress);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['progress'] });
-    },
-  });
-
   const currentQuestionData = questions[currentQuestion - 1];
 
   const handleAnswer = (isCorrect) => {
@@ -111,9 +109,8 @@ export default function Play() {
       const finalScore = isCorrect ? score + 1 : score;
       const stars = calculateStars(finalScore);
       
-      // Save progress
-      saveProgressMutation.mutate({
-        level_id: levelId,
+      // Save progress to localStorage
+      saveProgress(levelId, {
         stars_earned: stars,
         best_score: finalScore,
         completed: true,
@@ -150,7 +147,7 @@ export default function Play() {
   };
 
   const handleHome = () => {
-    navigate(createPageUrl('Home'));
+    navigate("/");
   };
 
   const getBgGradient = () => {
@@ -175,7 +172,7 @@ export default function Play() {
       {/* Header */}
       <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-sm shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to={createPageUrl('Home')}>
+          <Link to='/'>
             <Button variant="ghost" size="icon" className="rounded-full">
               <ArrowLeft className="w-5 h-5" />
             </Button>

@@ -14,11 +14,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<Play />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/time-challenge" element={<TimeChallenge />} />
-          <Route path="/mistake-notes" element={<MistakeNotes />} />
-          <Route path="/skill-practice" element={<SkillPractice />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/Play" element={<Play />} />         
+          <Route path="/TimeChallenge" element={<TimeChallenge />} />
+          <Route path="/MistakeNotes" element={<MistakeNotes />} />
+          <Route path="/SkillPractice" element={<SkillPractice />} />
         </Routes>
       </Router>
     </QueryClientProvider>

@@ -83,6 +83,19 @@ export default function Play() {
     queryFn: () => base44.entities.Progress.list(),
   });
 
+  // Clear progress on page mount
+  useEffect(() => {
+    const clearProgress = async () => {
+      if (progress.length > 0) {
+        for (const p of progress) {
+          await base44.entities.Progress.delete(p.id);
+        }
+        queryClient.invalidateQueries({ queryKey: ['progress'] });
+      }
+    };
+    clearProgress();
+  }, []);
+
   const saveProgressMutation = useMutation({
     mutationFn: async (newProgress) => {
       const existing = progress.find(p => p.level_id === levelId);
@@ -175,7 +188,7 @@ export default function Play() {
   };
 
   const handleHome = () => {
-    navigate(createPageUrl('/home'));
+    navigate('/');
   };
 
   const getBgGradient = () => {
@@ -200,7 +213,7 @@ export default function Play() {
       {/* Header */}
       <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-sm shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to={createPageUrl('/home')}>
+          <Link to="/">
             <Button variant="ghost" size="icon" className="rounded-full">
               <ArrowLeft className="w-5 h-5" />
             </Button>
