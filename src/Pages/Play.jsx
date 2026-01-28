@@ -98,6 +98,13 @@ export default function Play() {
     setGameState('playing');
   }, [levelId]);
 
+  // Clear progress for this level when component mounts or levelId changes
+  useEffect(() => {
+    const allProgress = JSON.parse(localStorage.getItem('mathGenius_progress') || '[]');
+    const filtered = allProgress.filter(p => p.level_id !== levelId);
+    localStorage.setItem('mathGenius_progress', JSON.stringify(filtered));
+  }, [levelId]);
+
   const currentQuestionData = questions[currentQuestion - 1];
 
   const handleAnswer = (isCorrect) => {
@@ -140,14 +147,23 @@ export default function Play() {
     setGameState('playing');
   };
 
-  const handleNextLevel = () => {
-    if (levelId < LEVELS.length) {
-      navigate(createPageUrl(`Play?level=${levelId + 1}`));
-    }
-  };
+const handleNextLevel = () => {
+  if (levelId < LEVELS.length) {
+    navigate(`?level=${levelId + 1}`);
+  }
+};
+
 
   const handleHome = () => {
     navigate("/");
+  };
+
+  const handleClearAllData = () => {
+    if (window.confirm('Are you sure you want to clear ALL progress data? This cannot be undone.')) {
+      localStorage.removeItem('mathGenius_progress');
+      localStorage.removeItem('mathGenius_mistakes');
+      window.location.reload();
+    }
   };
 
   const getBgGradient = () => {
@@ -216,6 +232,18 @@ export default function Play() {
 
       {/* Decorative elements */}
       <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/50 to-transparent pointer-events-none" />
+
+      {/* Clear Data Button */}
+      <div className="fixed bottom-4 right-4">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleClearAllData}
+          className="text-red-600 border-red-600 hover:bg-red-50"
+        >
+          Clear All Data
+        </Button>
+      </div>
     </div>
   );
 }
