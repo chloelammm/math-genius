@@ -5,7 +5,7 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  //base: '/math-genius/',           // ← ADD THIS LINE (your repo name)
+  base: '/math-genius/',      
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
