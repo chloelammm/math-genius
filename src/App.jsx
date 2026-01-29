@@ -12,7 +12,7 @@ const queryClient = new QueryClient()
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
+      <Router basename="/math-genius">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/Play" element={<Play />} />         
